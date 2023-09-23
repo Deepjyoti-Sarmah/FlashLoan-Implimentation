@@ -33,7 +33,8 @@ contract FlashLoan {
         IERC20(CROX).safeApprove(address(PANCAKE_ROUTER), MAX_INT);
         IERC20(CAKE).safeApprove(address(PANCAKE_ROUTER), MAX_INT);
 
-        const pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
+        // liquidity pool of BUSD and WBNB
+        address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
             _busdBorrow,
             WBNB
         );
@@ -46,10 +47,9 @@ contract FlashLoan {
         uint amount0Out = _busdBorrow == token0? _amount:0;
         uint amount1Out = _busdBorrow == token1? _amount:0;
 
-        
+        bytes memory data = abi.encode(_busdBorrow, _amount, msg.sender);
 
         IUniswapV2Pair(pair).swap(amount0Out, amount1Out, address(this), data);
 
-    }
-    
+    } 
 }
