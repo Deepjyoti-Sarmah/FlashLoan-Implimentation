@@ -33,7 +33,8 @@ contract FlashLoan {
     }
 
     function placeTrade(address _fromToken, address _toToken, uint _amount) private returns(uint){
-        address pair = IUniswapV2Factory
+        // address pair = IUniswapV2Factory
+
     }
 
     function initateArbitrage(address _busdBorrow, uint _amount) {
