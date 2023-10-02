@@ -59,6 +59,29 @@ contract FlashLoan {
 
       address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(token0, token1);
       require(msg.sender == pair, "pair does not match");
-      require(_sender == address(this));
+      require(_sender == address(this), "Sender does not match");
+
+      (address busdBorrow, uint amount, address myAccount) = abi.decode(
+        _data,(address,uint,address);
+      );
+
+      //fee calculation
+      uint fee = ((amount*3)/997)+1;
+      
+      uint repayAmount = amount+fee;
+
+      uint loanAmount = _amount0>0 ? _amount0: _amount1;
+
+      //Triangular arbitrage
+      uint trade1Coin = placeTrade(BUSD, CROX, loanAmount);
+      uint trade2Coin = placeTrade(CROX, CAKE, trade1Coin);
+      uint trade3Coin = placeTrade(CAKE, BUSD, trade2Coin);
+
+      bool result = checkResult(repyamount, trade3Coin);
+      require(result, "Arbitrage is not pofitable");
+      
+      IERC20(BUSD).transfer(myAccount, trade3Coin - repayAmount);
+
+
     }
 }
