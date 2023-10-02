@@ -28,6 +28,14 @@ contract FlashLoan {
     uint256 private deadline = block.timestamp + 1 days;
     uint256 private constant MAX_INT = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
 
+    function checkResult(uint _repayAmount, uint _acquiredCoin) private returns(bool) {
+        return _acquiredCoin > _repayAmount;
+    }
+
+    function placeTrade(address _fromToken, address _toToken, uint _amount) private returns(uint){
+        address pair = IUniswapV2Factory
+    }
+
     function initateArbitrage(address _busdBorrow, uint _amount) {
         IERC20(BUSD).safeApprove(address(PANCAKE_ROUTER), MAX_INT);
         IERC20(CROX).safeApprove(address(PANCAKE_ROUTER), MAX_INT);
@@ -81,7 +89,8 @@ contract FlashLoan {
       require(result, "Arbitrage is not pofitable");
       
       IERC20(BUSD).transfer(myAccount, trade3Coin - repayAmount);
-
-
+      IERC20(busdBorrow).transfer(pair, repayAmount);
     }
+
+
 }
