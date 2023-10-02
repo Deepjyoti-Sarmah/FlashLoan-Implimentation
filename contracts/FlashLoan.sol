@@ -26,7 +26,7 @@ contract FlashLoan {
     address private constant CAKE = 0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82;
 
     uint256 private deadline = block.timestamp + 1 days;
-    uint256 private constant MAX_INT =              115792089237316195423570985008687907853269984665640564039457584007913129639935;
+    uint256 private constant MAX_INT = 115792089237316195423570985008687907853269984665640564039457584007913129639935;
 
     function initateArbitrage(address _busdBorrow, uint _amount) {
         IERC20(BUSD).safeApprove(address(PANCAKE_ROUTER), MAX_INT);
