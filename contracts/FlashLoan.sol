@@ -52,4 +52,13 @@ contract FlashLoan {
         IUniswapV2Pair(pair).swap(amount0Out, amount1Out, address(this), data);
 
     } 
+
+    function pancakeCall(address _sender, uint _amount0, uint _amount1, bytes calldata _data) external {
+      address token0 = IUniswapV2Pair(msg.sender).token0();
+      address token1 = IUniswapV2Pair(msg.sender).token1();
+
+      address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(token0, token1);
+      require(msg.sender == pair, "pair does not match");
+      require(_sender == address(this));
+    }
 }
