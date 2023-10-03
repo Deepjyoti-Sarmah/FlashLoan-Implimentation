@@ -32,8 +32,24 @@ contract FlashLoan {
         return _acquiredCoin > _repayAmount;
     }
 
-    function placeTrade(address _fromToken, address _toToken, uint _amount) private returns(uint){
-        // address pair = IUniswapV2Factory
+    function placeTrade(address _fromToken, address _toToken, uint _amountIn) private returns(uint){
+        address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(
+            _fromToken,
+            _toToken
+        );
+        require(pair != address(0), "Pool does not exist");
+
+        address[] memory path = new address[](2); //length of array is 2 
+        path[0] = _fromToken;
+        path[1] = _toToken;
+
+        uint amountRequired = IUniswapV2Router01(PANCAKE_FACTORY).getAmountOut( _amountIn, path)[1];
+
+        uint amountReceived = IUniswapV2Router01(PANCAKE_ROUTER).swapExactTokensForTokens(_amountIn, amountRequired, path, address(this), deadline
+        )[1];
+
+        require(amountReceived > 0, "Transaction Abort");
+        return amountReceived;
 
     }
 
@@ -63,34 +79,34 @@ contract FlashLoan {
     } 
 
     function pancakeCall(address _sender, uint _amount0, uint _amount1, bytes calldata _data) external {
-      address token0 = IUniswapV2Pair(msg.sender).token0();
-      address token1 = IUniswapV2Pair(msg.sender).token1();
+        address token0 = IUniswapV2Pair(msg.sender).token0();
+        address token1 = IUniswapV2Pair(msg.sender).token1();
 
-      address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(token0, token1);
-      require(msg.sender == pair, "pair does not match");
-      require(_sender == address(this), "Sender does not match");
+        address pair = IUniswapV2Factory(PANCAKE_FACTORY).getPair(token0, token1);
+        require(msg.sender == pair, "pair does not match");
+        require(_sender == address(this), "Sender does not match");
 
-      (address busdBorrow, uint amount, address myAccount) = abi.decode(
-        _data,(address,uint,address);
-      );
+        (address busdBorrow, uint amount, address myAccount) = abi.decode(
+            _data,(address,uint,address);
+        );
 
-      //fee calculation
-      uint fee = ((amount*3)/997)+1;
-      
-      uint repayAmount = amount+fee;
+        //fee calculation
+        uint fee = ((amount*3)/997)+1;
+        
+        uint repayAmount = amount+fee;
 
-      uint loanAmount = _amount0>0 ? _amount0: _amount1;
+        uint loanAmount = _amount0>0 ? _amount0: _amount1;
 
-      //Triangular arbitrage
-      uint trade1Coin = placeTrade(BUSD, CROX, loanAmount);
-      uint trade2Coin = placeTrade(CROX, CAKE, trade1Coin);
-      uint trade3Coin = placeTrade(CAKE, BUSD, trade2Coin);
+        //Triangular arbitrage
+        uint trade1Coin = placeTrade(BUSD, CROX, loanAmount);
+        uint trade2Coin = placeTrade(CROX, CAKE, trade1Coin);
+        uint trade3Coin = placeTrade(CAKE, BUSD, trade2Coin);
 
-      bool result = checkResult(repyamount, trade3Coin);
-      require(result, "Arbitrage is not pofitable");
-      
-      IERC20(BUSD).transfer(myAccount, trade3Coin - repayAmount);
-      IERC20(busdBorrow).transfer(pair, repayAmount);
+        bool result = checkResult(repyamount, trade3Coin);
+        require(result, "Arbitrage is not pofitable");
+        
+        IERC20(BUSD).transfer(myAccount, trade3Coin - repayAmount);
+        IERC20(busdBorrow).transfer(pair, repayAmount);
     }
 
 
