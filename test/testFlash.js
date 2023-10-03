@@ -26,7 +26,11 @@ describe('Flashloan Contract', () => {
 
     beforeEach(async () => {
         const whale_balance = await provider.getBalance(BUSD_WHALE);
-        console.log(whale_balance);
+        // console.log(whale_balance);
+        expect(whale_balance).not.equal("0");
+
+        //Deploy smart contract
+        const FlashLoan = await ethers.getContractFactory("Flashloan")
     })
     
     it("testing",()=> {
