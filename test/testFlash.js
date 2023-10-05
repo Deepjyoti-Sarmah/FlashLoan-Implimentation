@@ -30,7 +30,23 @@ describe('Flashloan Contract', () => {
         expect(whale_balance).not.equal("0");
 
         //Deploy smart contract
-        const FlashLoan = await ethers.getContractFactory("Flashloan")
+        const FlashLoan = await ethers.getContractFactory("FlashLoan")
+        FLASHLOAN = await FlashLoan.deploy();
+        await FLASHLOAN.deployed();
+
+        const borrowAmountHuman = "1";
+        BORROW_AMOUNT = ethers.utils.parseUnits(borrowAmountHuman,DECIMALS);
+        
+        const initialFundingHuman = "100";
+        FUND_AMOUNT = ethers.utils.parseUnits(borrowAmountHuman,DECIMALS);
+        await fundContract(busdInstance, BUSD_WHALE, FLASHLOAN.address, initialFundingHuman);
+    })
+
+    describe("Arbitrage Execution", () => {
+        it("ensures the contract is funded", async() => {
+            const flashLoanBalance = await FLASHLOAN.getBalanceOfToken(BUSD);
+            const flashLoanBalanceHuman = ethers.utils.formatUnits(flashLoanBalance);
+        })
     })
     
     it("testing",()=> {
