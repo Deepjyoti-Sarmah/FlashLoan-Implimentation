@@ -48,6 +48,30 @@ describe('Flashloan Contract', () => {
             const flashLoanBalanceHuman = ethers.utils.formatUnits(flashLoanBalance, DECIMALS); 
             expect(Number(flashLoanBalanceHuman)).equal(Number(initialFundingHuman));
         })
+
+        it("execute the arbitrage", async() => {
+            txArbitrage = await FLASHLOAN.initateArbitrage(BUSD,BORROW_AMOUNT);
+            assert(txArbitrage);
+
+            // Print balances
+            const contractBalanceBUSD = await FLASHLOAN.getBalanceOfToken(BUSD);
+            const formattedBalBUSD = Number(
+                ethers.utils.formatUnits(contractBalanceBUSD, DECIMALS)
+            );
+            console.log("Balance of BUSD: " + formattedBalBUSD);
+
+            const contractBalanceCROX = await FLASHLOAN.getBalanceOfToken(CROX);
+            const formattedBalCROX = Number(
+                ethers.utils.formatUnits(contractBalanceCROX, DECIMALS)
+            );
+            console.log("Balance of CROX: " + formattedBalCROX);
+
+            const contractBalanceCAKE = await FLASHLOAN.getBalanceOfToken(CAKE);
+            const formattedBalCAKE = Number(
+                ethers.utils.formatUnits(contractBalanceCAKE, DECIMALS)
+            );
+            console.log("Balance of CAKE: " + formattedBalCAKE);
+                })
     })
     
 })
