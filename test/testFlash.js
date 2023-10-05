@@ -37,7 +37,7 @@ describe('Flashloan Contract', () => {
         const borrowAmountHuman = "1";
         BORROW_AMOUNT = ethers.utils.parseUnits(borrowAmountHuman,DECIMALS);
         
-        const initialFundingHuman = "100";
+        initialFundingHuman = "100";
         FUND_AMOUNT = ethers.utils.parseUnits(borrowAmountHuman,DECIMALS);
         await fundContract(busdInstance, BUSD_WHALE, FLASHLOAN.address, initialFundingHuman);
     })
@@ -45,12 +45,9 @@ describe('Flashloan Contract', () => {
     describe("Arbitrage Execution", () => {
         it("ensures the contract is funded", async() => {
             const flashLoanBalance = await FLASHLOAN.getBalanceOfToken(BUSD);
-            const flashLoanBalanceHuman = ethers.utils.formatUnits(flashLoanBalance);
+            const flashLoanBalanceHuman = ethers.utils.formatUnits(flashLoanBalance, DECIMALS); 
+            expect(Number(flashLoanBalanceHuman)).equal(Number(initialFundingHuman));
         })
     })
     
-    it("testing",()=> {
-
-    })
-
 })
